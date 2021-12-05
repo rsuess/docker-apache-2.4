@@ -22,7 +22,7 @@ ENV BUILD_DEPS \
 
 ENV RUN_DEPS \
 	ca-certificates \
-	python-yaml \
+	#python-yaml \
 	supervisor
 
 
@@ -39,13 +39,27 @@ ENV HTTPD_RELOAD="/usr/local/apache2/bin/httpd -k stop"
 ### Install required packages
 ###
 RUN set -x \
-	&& apt-get update \
-	&& apt-get install --no-install-recommends --no-install-suggests -y \
+	&& apt-get update 
+
+RUN apt-get update
+RUN apt -y install curl
+RUN  apt -y install ca-certificates
+RUN apt-get -y install python3
+RUN apt-get -y install python3-distutils
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python3 get-pip.py
+RUN ln -s /usr/bin/python3 /usr/bin/python & \
+    ln -s /usr/bin/pip3 /usr/bin/pip
+#RUN apt-get install -y python-pip
+#RUN pip install pip --upgrade pip
+RUN pip install pyyaml
+
+RUN apt-get install --no-install-recommends --no-install-suggests -y \
 		${BUILD_DEPS} \
 		${RUN_DEPS} \
 	\
 	# Install vhost-gen
-	&& git clone https://github.com/devilbox/vhost-gen \
+	&& git clone https://github.com/rsuess/vhost-gen \
 	&& cd vhost-gen \
 	&& git checkout "${VHOST_GEN_GIT_REF}" \
 	&& make install \
